@@ -1,0 +1,564 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  user-select: none;
+  font-size: 13px;
+}
+
+/* ===== 整体左右布局 ===== */
+.app-layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar {
+  height: 100%;
+  background: #252526;
+  border-right: 1px solid #3c3c3c;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.splitter {
+  width: 4px;
+  height: 100%;
+  background: #3c3c3c;
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.splitter:hover {
+  background: #0e639c;
+}
+
+.main-area {
+  height: 100%;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== 顶部分组栏 ===== */
+.group-bar {
+  height: 38px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  background: #2d2d2d;
+  border-bottom: 1px solid #3c3c3c;
+  gap: 8px;
+}
+
+.group-name-area {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.group-name {
+  font-size: 13px;
+  color: #fff;
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.group-name:hover {
+  background: #3c3c3c;
+}
+
+.group-name.single {
+  color: #ccc;
+  cursor: default;
+}
+
+.group-name.single:hover {
+  background: transparent;
+}
+
+.group-layout-tag {
+  font-size: 10px;
+  color: #888;
+  background: #1e1e1e;
+  padding: 1px 5px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.group-name-input {
+  font-size: 13px;
+  background: #1e1e1e;
+  color: #fff;
+  border: 1px solid #0e639c;
+  border-radius: 3px;
+  padding: 2px 6px;
+  outline: none;
+  min-width: 80px;
+}
+
+.group-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.group-switch {
+  height: 24px;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border: 1px solid #3c3c3c;
+  border-radius: 3px;
+  font-size: 11px;
+  padding: 0 6px;
+  outline: none;
+  cursor: pointer;
+  max-width: 160px;
+}
+
+.layout-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  justify-content: flex-end;
+}
+
+.layout-btn {
+  width: 24px;
+  height: 22px;
+  background: #3c3c3c;
+  color: #ccc;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: background 0.12s;
+}
+
+.layout-btn:hover {
+  background: #4a4a4a;
+}
+
+.layout-btn.active {
+  background: #0e639c;
+  color: #fff;
+}
+
+/* ===== 左侧会话池 ===== */
+.session-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.session-list-header {
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #cccccc;
+  border-bottom: 1px solid #3c3c3c;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.btn-new {
+  width: 22px;
+  height: 22px;
+  background: #0e639c;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.btn-new:hover {
+  background: #1177bb;
+}
+
+.session-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px;
+}
+
+.session-list-empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  text-align: center;
+  color: #6b6b6b;
+}
+
+.placeholder-icon {
+  font-size: 30px;
+  opacity: 0.4;
+  letter-spacing: 4px;
+}
+
+.placeholder-title {
+  font-size: 12px;
+  color: #888;
+}
+
+.placeholder-hint {
+  font-size: 11px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.session-list-tip {
+  padding: 8px 12px;
+  font-size: 10px;
+  color: #666;
+  border-top: 1px solid #3c3c3c;
+  line-height: 1.5;
+}
+
+/* ===== 会话项 ===== */
+.session-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.1s;
+}
+
+.session-item:hover {
+  background: #2a2d2e;
+}
+
+/* shown：该会话正显示在当前活动分组/单一视图 → 高亮 */
+.session-item.shown {
+  background: #37373d;
+  border-color: #4ec9b0;
+}
+
+.session-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.session-status.on {
+  background: #4ec9b0;
+  box-shadow: 0 0 4px #4ec9b0;
+}
+
+.session-status.off {
+  background: #5a5a5a;
+}
+
+.session-name {
+  flex: 1;
+  font-size: 12.5px;
+  color: #d4d4d4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.session-name-input {
+  flex: 1;
+  font-size: 12.5px;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border: 1px solid #0e639c;
+  border-radius: 2px;
+  padding: 2px 4px;
+  outline: none;
+  min-width: 0;
+}
+
+.session-shell {
+  font-size: 10px;
+  color: #888;
+  background: #3c3c3c;
+  padding: 1px 5px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.session-actions {
+  display: none;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.session-item:hover .session-actions {
+  display: flex;
+}
+
+.icon-btn {
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  border-radius: 2px;
+  font-size: 12px;
+}
+
+.icon-btn:hover {
+  background: #4a4a4a;
+  color: #fff;
+}
+
+.icon-btn.danger:hover {
+  background: #a1260d;
+}
+
+/* ===== 右侧分屏区（动态 CSS Grid） ===== */
+.split-view {
+  width: 100%;
+  flex: 1;
+  display: grid;
+  gap: 2px;
+  background: #2d2d2d;
+  min-height: 0;
+}
+
+.pane-slot {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 终端窗口标题栏 */
+.pane-header {
+  height: 26px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 6px;
+  background: #2d2d2d;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.pane-select {
+  flex: 1;
+  min-width: 0;
+  height: 20px;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border: 1px solid #3c3c3c;
+  border-radius: 3px;
+  font-size: 11px;
+  padding: 0 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.pane-select:hover {
+  border-color: #0e639c;
+}
+
+.pane-title {
+  flex: 1;
+  font-size: 12px;
+  color: #cccccc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminal-pane {
+  flex: 1;
+  min-height: 0;
+  padding: 4px;
+  background: #1e1e1e;
+  overflow: hidden;
+}
+
+.terminal-pane .xterm {
+  width: 100%;
+  height: 100%;
+}
+
+.terminal-pane .xterm-viewport {
+  overflow-y: auto !important;
+}
+
+.empty-slot {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #555;
+  background: #1e1e1e;
+}
+
+.empty-slot-icon {
+  font-size: 32px;
+  opacity: 0.3;
+}
+
+.empty-slot-hint {
+  font-size: 11px;
+  color: #666;
+}
+
+/* ===== 新建会话弹窗 ===== */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.dialog {
+  width: 380px;
+  background: #252526;
+  border: 1px solid #454545;
+  border-radius: 6px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+.dialog-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  color: #aaa;
+}
+
+.form-input {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border: 1px solid #3c3c3c;
+  border-radius: 3px;
+  padding: 6px 8px;
+  font-size: 13px;
+  outline: none;
+  min-width: 0;
+  flex: 1;
+}
+
+.form-input:focus {
+  border-color: #0e639c;
+}
+
+.cwd-row {
+  display: flex;
+  gap: 6px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.btn-secondary {
+  background: #3c3c3c;
+  color: #ccc;
+}
+
+.btn-secondary:hover {
+  background: #4a4a4a;
+}
+
+.btn-primary {
+  background: #0e639c;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #1177bb;
+}
+
+.btn-danger {
+  background: #a1260d;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: #c42b0f;
+}
+
+.confirm-message {
+  font-size: 13px;
+  color: #ccc;
+  line-height: 1.6;
+}
+
+.default-btn {
+  background: transparent;
+  color: #4ec9b0;
+  border: 1px solid #4ec9b0;
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
+.default-btn:hover {
+  background: #4ec9b0;
+  color: #1e1e1e;
+}
