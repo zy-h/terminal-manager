@@ -145,6 +145,21 @@ body {
   max-width: 160px;
 }
 
+.lang-btn {
+  height: 24px;
+  padding: 0 8px;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border: 1px solid #3c3c3c;
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.lang-btn:hover {
+  border-color: #0e639c;
+}
+
 .layout-switcher {
   display: flex;
   flex-wrap: wrap;
@@ -288,8 +303,15 @@ body {
   background: #5a5a5a;
 }
 
-.session-name {
+.session-text {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.session-name {
   font-size: 12.5px;
   color: #d4d4d4;
   overflow: hidden;
@@ -311,11 +333,10 @@ body {
 
 .session-shell {
   font-size: 10px;
-  color: #888;
-  background: #3c3c3c;
-  padding: 1px 5px;
-  border-radius: 2px;
-  flex-shrink: 0;
+  color: #777;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .session-actions {

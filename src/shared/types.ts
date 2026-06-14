@@ -35,9 +35,13 @@ export type SessionStatus = 'idle' | 'active'
 /** 分屏布局模式：1~8 个终端 */
 export type LayoutMode = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 
+/** 界面语言 */
+export type Lang = 'zh' | 'en'
+
 /** 应用设置 */
 export interface Settings {
   defaultCwd: string
+  language: Lang
 }
 
 /** 通过 contextBridge 暴露给渲染进程的终端 API 形状 */
@@ -65,6 +69,7 @@ export interface TerminalApi {
   settings: {
     get: () => Promise<Settings>
     setDefaultCwd: (cwd: string) => Promise<void>
+    setLanguage: (lang: Lang) => Promise<void>
   }
 }
 

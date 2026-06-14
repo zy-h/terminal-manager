@@ -1,4 +1,5 @@
 import type { LayoutMode } from '@shared/types'
+import { useT } from '../store/useStore'
 
 interface LayoutSwitcherProps {
   layout: LayoutMode
@@ -9,6 +10,7 @@ const MODES: LayoutMode[] = [1, 2, 3, 4, 5, 6, 7, 8]
 
 /** 1~8 分屏模式切换器 */
 export default function LayoutSwitcher({ layout, onChange }: LayoutSwitcherProps) {
+  const t = useT()
   return (
     <div className="layout-switcher">
       {MODES.map((m) => (
@@ -16,7 +18,7 @@ export default function LayoutSwitcher({ layout, onChange }: LayoutSwitcherProps
           key={m}
           className={`layout-btn ${layout === m ? 'active' : ''}`}
           onClick={() => onChange(m)}
-          title={`${m} 个终端`}
+          title={t('layout.count', { n: m })}
         >
           {m}
         </button>

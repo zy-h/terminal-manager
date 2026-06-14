@@ -1,8 +1,9 @@
 import TerminalPane from './TerminalPane'
-import { useStore } from '../store/useStore'
+import { useStore, useT } from '../store/useStore'
 
 /** 单一视图：点未分组会话时进入，该会话独占全屏 */
 export default function SingleView() {
+  const t = useT()
   const singleSessionId = useStore((s) => s.singleSessionId)
   const sessions = useStore((s) => s.sessions)
 
@@ -19,7 +20,7 @@ export default function SingleView() {
     >
       <div className="pane-slot" style={{ gridArea: 'a' }}>
         <div className="pane-header">
-          <span className="pane-title">{session?.name ?? '未选择会话'}</span>
+          <span className="pane-title">{session?.name ?? t('pane.empty.unselected')}</span>
         </div>
         {session ? (
           <TerminalPane
@@ -30,7 +31,7 @@ export default function SingleView() {
         ) : (
           <div className="empty-slot">
             <div className="empty-slot-icon">▢</div>
-            <div className="empty-slot-hint">点击左侧会话开始</div>
+            <div className="empty-slot-hint">{t('pane.empty.single')}</div>
           </div>
         )}
       </div>

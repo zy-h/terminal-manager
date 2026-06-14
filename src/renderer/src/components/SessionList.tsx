@@ -2,9 +2,10 @@ import { useState } from 'react'
 import SessionItem from './SessionItem'
 import NewSessionDialog from './NewSessionDialog'
 import ConfirmDialog from './ConfirmDialog'
-import { useStore } from '../store/useStore'
+import { useStore, useT } from '../store/useStore'
 
 export default function SessionList() {
+  const t = useT()
   const sessions = useStore((s) => s.sessions)
   const groups = useStore((s) => s.groups)
   const activeGroupId = useStore((s) => s.activeGroupId)
@@ -28,8 +29,8 @@ export default function SessionList() {
   return (
     <div className="session-list">
       <div className="session-list-header">
-        <span>会话池</span>
-        <button className="btn-new" onClick={() => setDialogOpen(true)} title="新建会话">
+        <span>{t('session.pool')}</span>
+        <button className="btn-new" onClick={() => setDialogOpen(true)} title={t('session.new')}>
           +
         </button>
       </div>
@@ -37,8 +38,8 @@ export default function SessionList() {
         {sessions.length === 0 ? (
           <div className="session-list-empty">
             <div className="placeholder-icon">⟨ ⟩</div>
-            <div className="placeholder-title">还没有会话</div>
-            <div className="placeholder-hint">点击右上角 + 新建终端会话</div>
+            <div className="placeholder-title">{t('session.empty.title')}</div>
+            <div className="placeholder-hint">{t('session.empty.hint')}</div>
           </div>
         ) : (
           sessions.map((s) => (
@@ -53,13 +54,13 @@ export default function SessionList() {
           ))
         )}
       </div>
-      <div className="session-list-tip">点击会话 → 单一显示 · 切换分组用顶部下拉</div>
+      <div className="session-list-tip">{t('session.tip')}</div>
       {dialogOpen && <NewSessionDialog onClose={() => setDialogOpen(false)} />}
       {confirmDelete && (
         <ConfirmDialog
-          title="删除会话"
-          message={`确定删除会话「${confirmDelete.name}」吗？该操作不可撤销。`}
-          confirmText="删除"
+          title={t('session.delete.title')}
+          message={t('session.delete.msg', { name: confirmDelete.name })}
+          confirmText={t('common.delete')}
           onConfirm={() => {
             removeSession(confirmDelete.id)
             setConfirmDelete(null)

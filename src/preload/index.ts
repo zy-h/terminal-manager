@@ -41,7 +41,8 @@ const api: TerminalApi = {
   },
   settings: {
     get: () => ipcRenderer.invoke('settings:get'),
-    setDefaultCwd: (cwd) => ipcRenderer.invoke('settings:setDefaultCwd', { cwd })
+    setDefaultCwd: (cwd) => ipcRenderer.invoke('settings:setDefaultCwd', { cwd }),
+    setLanguage: (lang) => ipcRenderer.invoke('settings:setLanguage', { lang })
   }
 }
 

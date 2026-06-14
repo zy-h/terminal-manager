@@ -1,3 +1,5 @@
+import { useT } from '../store/useStore'
+
 interface ConfirmDialogProps {
   title: string
   message: string
@@ -14,6 +16,7 @@ export default function ConfirmDialog({
   onConfirm,
   onCancel
 }: ConfirmDialogProps) {
+  const t = useT()
   return (
     <div className="dialog-overlay" onClick={onCancel}>
       <div className="dialog confirm-dialog" onClick={(e) => e.stopPropagation()}>
@@ -21,7 +24,7 @@ export default function ConfirmDialog({
         <div className="confirm-message">{message}</div>
         <div className="dialog-actions">
           <button className="btn btn-secondary" onClick={onCancel}>
-            取消
+            {t('dialog.cancel')}
           </button>
           <button className="btn btn-danger" onClick={onConfirm}>
             {confirmText}

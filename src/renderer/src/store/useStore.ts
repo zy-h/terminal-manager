@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import type { Session, ShellInfo, ShellType, LayoutMode, Settings } from '@shared/types'
+import type { Session, ShellInfo, ShellType, LayoutMode, Settings, Lang } from '@shared/types'
+import { translate } from '../i18n'
 
 /** 一个分屏分组：名称 + 窗口数 + 排版预设 + 每格会话（可重复=复制显示） */
 export interface Group {
@@ -16,6 +17,8 @@ interface AppState {
   sessions: Session[]
   shells: ShellInfo[]
   settings: Settings
+  /** 当前界面语言（独立存一份，便于 useT 订阅） */
+  language: Lang
 
   groups: Group[]
   activeGroupId: string | null
@@ -25,6 +28,7 @@ interface AppState {
   load: () => Promise<void>
   setLeftPct: (p: number) => void
   setDefaultCwd: (cwd: string) => Promise<void>
+  setLanguage: (lang: Lang) => Promise<void>
 
   // 分组操作
   createGroupByLayout: (n: LayoutMode) => void
@@ -57,7 +61,8 @@ function padSlots(slots: string[], n: number): string[] {
 export const useStore = create<AppState>((set, get) => ({
   sessions: [],
   shells: [],
-  settings: { defaultCwd: '' },
+  settings: { defaultCwd: '', language: 'zh' },
+  language: 'zh',
   groups: [],
   activeGroupId: null,
   singleSessionId: null,
@@ -69,7 +74,12 @@ export const useStore = create<AppState>((set, get) => ({
       window.api.shell.detect(),
       window.api.settings.get()
     ])
-    set({ sessions, shells: shells.filter((s) => s.available), settings })
+    set({
+      sessions,
+      shells: shells.filter((s) => s.available),
+      settings,
+      language: settings.language
+    })
   },
 
   setLeftPct: (p) => set({ leftPct: p }),
@@ -77,6 +87,11 @@ export const useStore = create<AppState>((set, get) => ({
   setDefaultCwd: async (cwd) => {
     await window.api.settings.setDefaultCwd(cwd)
     set({ settings: { ...get().settings, defaultCwd: cwd } })
+  },
+
+  setLanguage: async (lang) => {
+    await window.api.settings.setLanguage(lang)
+    set({ language: lang, settings: { ...get().settings, language: lang } })
   },
 
   createGroupByLayout: (n) => {
@@ -97,7 +112,7 @@ export const useStore = create<AppState>((set, get) => ({
     )
     const group: Group = {
       id: genGroupId(),
-      name: `分组 ${groups.length + 1}`,
+      name: translate(get().language, 'group.defaultName', { n: groups.length + 1 }),
       layout: n,
       presetIndex: 0,
       slots
@@ -189,3 +204,10 @@ export const useStore = create<AppState>((set, get) => ({
     })
   }
 }))
+
+/** 翻译 hook：组件中 const t = useT() 后用 t('key', {var}) */
+export function useT() {
+  const lang = useStore((s) => s.language)
+  return (key: string, vars?: Record<string, string | number>): string =>
+    translate(lang, key, vars)
+}

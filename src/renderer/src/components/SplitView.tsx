@@ -1,5 +1,6 @@
 import TerminalPane from './TerminalPane'
 import { getPresets } from '../layoutPresets'
+import { useT } from '../store/useStore'
 import type { Group } from '../store/useStore'
 import type { Session } from '@shared/types'
 
@@ -14,6 +15,7 @@ interface SplitViewProps {
 
 /** 渲染一个分屏分组：按 layout + presetIndex 取排版，每格标题下拉可选会话（允许重复） */
 export default function SplitView({ group, sessions, onSelectSlotSession, onClearSlot }: SplitViewProps) {
+  const t = useT()
   const presets = getPresets(group.layout)
   const preset = presets[group.presetIndex] ?? presets[0]
   const areas = preset.areas
@@ -40,14 +42,14 @@ export default function SplitView({ group, sessions, onSelectSlotSession, onClea
               <select
                 className="pane-select"
                 value={sid}
-                title="选择该窗口显示的会话（可重复=复制显示）"
+                title={t('pane.select.title')}
                 onChange={(e) => {
                   const v = e.target.value
                   if (v) onSelectSlotSession(i, v)
                   else onClearSlot(i)
                 }}
               >
-                <option value="">（未选择）</option>
+                <option value="">{t('pane.notSelected')}</option>
                 {sessions.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.name}
@@ -64,7 +66,7 @@ export default function SplitView({ group, sessions, onSelectSlotSession, onClea
             ) : (
               <div className="empty-slot">
                 <div className="empty-slot-icon">▢</div>
-                <div className="empty-slot-hint">在上方下拉选择会话</div>
+                <div className="empty-slot-hint">{t('pane.select.hint')}</div>
               </div>
             )}
           </div>
