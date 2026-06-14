@@ -2,7 +2,7 @@ import { app, BrowserWindow, shell, Tray, Menu, nativeImage } from 'electron'
 import { join } from 'path'
 import { TerminalManager } from './terminal/manager'
 import { registerIpc } from './ipc/handlers'
-import { initStore } from './store/sessions'
+import { initStore, clearSessions } from './store/sessions'
 import { initSettings } from './store/settings'
 
 // 捕获主进程未处理异常，输出到日志便于诊断（避免静默崩溃导致 exit 1）
@@ -114,6 +114,7 @@ app.whenReady().then(() => {
 
 app.on('before-quit', () => {
   isQuitting = true
+  clearSessions() // 彻底退出时清空所有会话，重新打开为空列表
   terminalManager.killAll()
 })
 

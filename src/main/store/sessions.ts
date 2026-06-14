@@ -69,3 +69,9 @@ export function deleteSession(id: string): void {
   sessions = sessions.filter((x) => x.id !== id)
   saveToDisk(sessions)
 }
+
+/** 彻底退出时清空全部会话（重新打开应用后会话列表为空） */
+export function clearSessions(): void {
+  sessions = []
+  saveToDisk(sessions)
+}
