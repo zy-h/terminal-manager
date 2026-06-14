@@ -4,8 +4,9 @@ import type { Group } from '../store/useStore'
 import { getPresets } from '../layoutPresets'
 import LayoutSwitcher from './LayoutSwitcher'
 import ConfirmDialog from './ConfirmDialog'
+import ColorPaletteDialog from './ColorPaletteDialog'
 
-/** 顶部分组栏：分组名(改名) + 排版下拉 + 分组切换下拉 + 语言切换 + 删除组(确认) + 窗口数 */
+/** 顶部分组栏：分组名 + 排版 + 分组切换 + 语言 + 背景色 + 删除组 + 窗口数 */
 export default function GroupBar() {
   const t = useT()
   const groups = useStore((s) => s.groups)
@@ -19,10 +20,12 @@ export default function GroupBar() {
   const createGroupByLayout = useStore((s) => s.createGroupByLayout)
   const language = useStore((s) => s.language)
   const setLanguage = useStore((s) => s.setLanguage)
+  const terminalBgColor = useStore((s) => s.settings.terminalBgColor)
 
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
   const [confirmDelete, setConfirmDelete] = useState<Group | null>(null)
+  const [colorDialogOpen, setColorDialogOpen] = useState(false)
 
   const activeGroup = groups.find((g) => g.id === activeGroupId) ?? null
   const singleSession = singleSessionId ? sessions.find((s) => s.id === singleSessionId) ?? null : null
@@ -116,6 +119,12 @@ export default function GroupBar() {
         >
           {t('lang.toggle')}
         </button>
+        <button
+          className="color-trigger"
+          style={{ background: terminalBgColor }}
+          onClick={() => setColorDialogOpen(true)}
+          title={t('terminal.bgColor')}
+        />
         <LayoutSwitcher layout={activeGroup?.layout ?? 1} onChange={createGroupByLayout} />
       </div>
 
@@ -131,6 +140,7 @@ export default function GroupBar() {
           onCancel={() => setConfirmDelete(null)}
         />
       )}
+      {colorDialogOpen && <ColorPaletteDialog onClose={() => setColorDialogOpen(false)} />}
     </div>
   )
 }

@@ -41,7 +41,9 @@ const zh: Record<string, string> = {
   'dialog.cancel': '取消',
   'dialog.create': '创建并打开',
   'common.delete': '删除',
-  'lang.toggle': 'EN'
+  'lang.toggle': 'EN',
+  'terminal.bgColor': '终端背景色',
+  'terminal.customColor': '自定义颜色'
 }
 
 const en: Record<string, string> = {
@@ -85,7 +87,9 @@ const en: Record<string, string> = {
   'dialog.cancel': 'Cancel',
   'dialog.create': 'Create & open',
   'common.delete': 'Delete',
-  'lang.toggle': '中'
+  'lang.toggle': '中',
+  'terminal.bgColor': 'Terminal background',
+  'terminal.customColor': 'Custom color'
 }
 
 const dicts: Record<Lang, Record<string, string>> = { zh, en }

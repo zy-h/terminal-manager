@@ -42,6 +42,9 @@ export type Lang = 'zh' | 'en'
 export interface Settings {
   defaultCwd: string
   language: Lang
+  terminalBgColor: string
+  /** 是否已展示过"关闭即最小化"的提示（只首次提示） */
+  minimizeHintShown: boolean
 }
 
 /** 通过 contextBridge 暴露给渲染进程的终端 API 形状 */
@@ -70,6 +73,7 @@ export interface TerminalApi {
     get: () => Promise<Settings>
     setDefaultCwd: (cwd: string) => Promise<void>
     setLanguage: (lang: Lang) => Promise<void>
+    setTerminalBgColor: (color: string) => Promise<void>
   }
 }
 

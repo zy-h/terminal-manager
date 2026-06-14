@@ -3,12 +3,17 @@ import { join } from 'path'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import type { Settings, Lang } from '../../shared/types'
 
-/** 应用设置持久化：读写 userData/settings.json（默认目录、界面语言） */
+/** 应用设置持久化：读写 userData/settings.json */
 function settingsPath(): string {
   return join(app.getPath('userData'), 'settings.json')
 }
 
-let settings: Settings = { defaultCwd: '', language: 'zh' }
+let settings: Settings = {
+  defaultCwd: '',
+  language: 'zh',
+  terminalBgColor: '#1e1e1e',
+  minimizeHintShown: false
+}
 
 /** 应用 ready 后调用，从磁盘恢复设置 */
 export function initSettings(): void {
@@ -18,7 +23,10 @@ export function initSettings(): void {
       const data = JSON.parse(readFileSync(p, 'utf-8'))
       settings = {
         defaultCwd: typeof data.defaultCwd === 'string' ? data.defaultCwd : '',
-        language: data.language === 'en' ? 'en' : 'zh'
+        language: data.language === 'en' ? 'en' : 'zh',
+        terminalBgColor:
+          typeof data.terminalBgColor === 'string' ? data.terminalBgColor : '#1e1e1e',
+        minimizeHintShown: data.minimizeHintShown === true
       }
     }
   } catch {
@@ -45,5 +53,15 @@ export function setDefaultCwd(cwd: string): void {
 
 export function setLanguage(lang: Lang): void {
   settings = { ...settings, language: lang }
+  save()
+}
+
+export function setTerminalBgColor(color: string): void {
+  settings = { ...settings, terminalBgColor: color }
+  save()
+}
+
+export function setMinimizeHintShown(shown: boolean): void {
+  settings = { ...settings, minimizeHintShown: shown }
   save()
 }

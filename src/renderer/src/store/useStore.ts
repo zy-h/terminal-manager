@@ -29,6 +29,7 @@ interface AppState {
   setLeftPct: (p: number) => void
   setDefaultCwd: (cwd: string) => Promise<void>
   setLanguage: (lang: Lang) => Promise<void>
+  setTerminalBgColor: (color: string) => Promise<void>
 
   // 分组操作
   createGroupByLayout: (n: LayoutMode) => void
@@ -61,7 +62,7 @@ function padSlots(slots: string[], n: number): string[] {
 export const useStore = create<AppState>((set, get) => ({
   sessions: [],
   shells: [],
-  settings: { defaultCwd: '', language: 'zh' },
+  settings: { defaultCwd: '', language: 'zh', terminalBgColor: '#1e1e1e', minimizeHintShown: false },
   language: 'zh',
   groups: [],
   activeGroupId: null,
@@ -92,6 +93,11 @@ export const useStore = create<AppState>((set, get) => ({
   setLanguage: async (lang) => {
     await window.api.settings.setLanguage(lang)
     set({ language: lang, settings: { ...get().settings, language: lang } })
+  },
+
+  setTerminalBgColor: async (color) => {
+    await window.api.settings.setTerminalBgColor(color)
+    set({ settings: { ...get().settings, terminalBgColor: color } })
   },
 
   createGroupByLayout: (n) => {

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import type { ShellType } from '@shared/types'
+import { useStore } from '../store/useStore'
 import '@xterm/xterm/css/xterm.css'
 
 interface TerminalPaneProps {
@@ -12,11 +13,13 @@ interface TerminalPaneProps {
 
 /**
  * 纯终端区：订阅某会话的 pty 输出 + 发送输入。
- * 不管理 pty 生命周期（pty 按会话唯一，多窗口共享；由会话删除/应用退出时销毁），
- * 因此同会话的多个 TerminalPane 天然输入输出同步。
+ * 不管理 pty 生命周期（pty 按会话唯一，多窗口共享）。
+ * 背景色来自全局设置，变化时动态更新主题（不重建终端）。
  */
 export default function TerminalPane({ sessionId, shellType, cwd }: TerminalPaneProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const termRef = useRef<Terminal | null>(null)
+  const bgColor = useStore((s) => s.settings.terminalBgColor)
 
   useEffect(() => {
     const container = containerRef.current
@@ -26,8 +29,9 @@ export default function TerminalPane({ sessionId, shellType, cwd }: TerminalPane
       fontFamily: 'Consolas, "Courier New", monospace',
       fontSize: 14,
       cursorBlink: true,
-      theme: { background: '#1e1e1e', foreground: '#d4d4d4', cursor: '#d4d4d4' }
+      theme: { background: bgColor, foreground: '#d4d4d4', cursor: '#d4d4d4' }
     })
+    termRef.current = term
     const fitAddon = new FitAddon()
     term.loadAddon(fitAddon)
     term.open(container)
@@ -47,7 +51,6 @@ export default function TerminalPane({ sessionId, shellType, cwd }: TerminalPane
       return true
     })
 
-    // resize 防抖（80ms），避免布局变化时频繁 resize 触发 ConPTY 原生崩溃
     let fitTimer: number | null = null
     const doFit = (): void => {
       if (fitTimer !== null) window.clearTimeout(fitTimer)
@@ -57,7 +60,6 @@ export default function TerminalPane({ sessionId, shellType, cwd }: TerminalPane
       }, 80)
     }
 
-    // 复用会话的 pty（已存在则不重建）→ 同会话多窗口共享
     window.api.terminal.spawn(sessionId, shellType, cwd)
     requestAnimationFrame(doFit)
 
@@ -73,15 +75,25 @@ export default function TerminalPane({ sessionId, shellType, cwd }: TerminalPane
     window.addEventListener('resize', doFit)
 
     return () => {
+      termRef.current = null
       if (fitTimer !== null) window.clearTimeout(fitTimer)
       offData()
       inputDisposable.dispose()
       ro.disconnect()
       window.removeEventListener('resize', doFit)
-      // 注意：不 kill pty（pty 按会话唯一，多窗口共享，会话持续）
+      window.api.terminal.kill(sessionId)
       term.dispose()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, shellType, cwd])
+
+  // 背景色变化时更新主题（不重建终端、不丢历史）
+  useEffect(() => {
+    const term = termRef.current
+    if (term) {
+      term.options.theme = { background: bgColor, foreground: '#d4d4d4', cursor: '#d4d4d4' }
+    }
+  }, [bgColor])
 
   return <div className="terminal-pane" ref={containerRef} />
 }

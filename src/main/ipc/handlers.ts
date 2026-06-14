@@ -7,7 +7,7 @@ import {
   renameSession,
   deleteSession
 } from '../store/sessions'
-import { getSettings, setDefaultCwd, setLanguage } from '../store/settings'
+import { getSettings, setDefaultCwd, setLanguage, setTerminalBgColor } from '../store/settings'
 import type { ShellType, Lang } from '../../shared/types'
 
 /** 注册终端、Shell 探测、会话管理、系统对话框相关的 IPC 通道 */
@@ -69,6 +69,10 @@ export function registerIpc(manager: TerminalManager): void {
   })
   ipcMain.handle('settings:setLanguage', (_e, args: { lang: Lang }) => {
     setLanguage(args.lang)
+    return { ok: true }
+  })
+  ipcMain.handle('settings:setTerminalBgColor', (_e, args: { color: string }) => {
+    setTerminalBgColor(args.color)
     return { ok: true }
   })
 }

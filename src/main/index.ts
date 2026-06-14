@@ -1,9 +1,9 @@
-import { app, BrowserWindow, shell, Tray, Menu, nativeImage } from 'electron'
+import { app, BrowserWindow, shell, Tray, Menu, nativeImage, dialog } from 'electron'
 import { join } from 'path'
 import { TerminalManager } from './terminal/manager'
 import { registerIpc } from './ipc/handlers'
 import { initStore, clearSessions } from './store/sessions'
-import { initSettings } from './store/settings'
+import { initSettings, getSettings, setMinimizeHintShown } from './store/settings'
 
 // 捕获主进程未处理异常，输出到日志便于诊断（避免静默崩溃导致 exit 1）
 process.on('uncaughtException', (err) => {
@@ -74,11 +74,29 @@ function createWindow(): void {
     mainWindow.show()
   })
 
-  // 关闭按钮（X）→ 最小化到托盘；彻底退出只能通过托盘右键菜单
+  // 关闭按钮（X）→ 最小化到托盘；彻底退出只能通过托盘右键菜单。
+  // 首次点关闭时弹提示说明（仅一次）
   mainWindow.on('close', (e) => {
     if (!isQuitting) {
       e.preventDefault()
-      mainWindow.hide()
+      if (!getSettings().minimizeHintShown) {
+        const isEn = getSettings().language === 'en'
+        dialog
+          .showMessageBox(mainWindow, {
+            type: 'info',
+            message: isEn ? 'Minimized to tray' : '已最小化到系统托盘',
+            detail: isEn
+              ? 'Closing the window only minimizes it to the system tray; the app keeps running. To fully quit, right-click the tray icon and choose "Quit".'
+              : '点击关闭按钮只会最小化到系统托盘，程序仍在后台运行。如需彻底退出，请在状态栏的图标上右键选择"彻底退出"。',
+            buttons: ['OK']
+          })
+          .then(() => {
+            setMinimizeHintShown(true)
+            mainWindow.hide()
+          })
+      } else {
+        mainWindow.hide()
+      }
     }
   })
 
