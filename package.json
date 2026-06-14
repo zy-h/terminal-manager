@@ -1,6 +1,6 @@
 {
   "name": "terminal-manager",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Windows 终端管理器 —— 会话池 + 分屏，支持 PowerShell/CMD/WSL/Git Bash",
   "main": "./out/main/index.js",
   "author": "",
