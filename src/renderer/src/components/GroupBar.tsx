@@ -21,6 +21,8 @@ export default function GroupBar() {
   const language = useStore((s) => s.language)
   const setLanguage = useStore((s) => s.setLanguage)
   const terminalBgColor = useStore((s) => s.settings.terminalBgColor)
+  const terminalFontSize = useStore((s) => s.settings.terminalFontSize)
+  const setTerminalFontSize = useStore((s) => s.setTerminalFontSize)
 
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
@@ -125,6 +127,29 @@ export default function GroupBar() {
           onClick={() => setColorDialogOpen(true)}
           title={t('terminal.bgColor')}
         />
+        <div className="font-zoom">
+          <button
+            className="font-btn"
+            onClick={() => setTerminalFontSize(terminalFontSize - 1)}
+            title={t('terminal.font.smaller')}
+          >
+            A−
+          </button>
+          <button
+            className="font-btn font-size-label"
+            onClick={() => setTerminalFontSize(14)}
+            title={t('terminal.font.reset')}
+          >
+            {terminalFontSize}
+          </button>
+          <button
+            className="font-btn"
+            onClick={() => setTerminalFontSize(terminalFontSize + 1)}
+            title={t('terminal.font.bigger')}
+          >
+            A+
+          </button>
+        </div>
         <LayoutSwitcher layout={activeGroup?.layout ?? 1} onChange={createGroupByLayout} />
       </div>
 

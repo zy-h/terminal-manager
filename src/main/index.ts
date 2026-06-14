@@ -113,6 +113,10 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  // 移除 Electron 默认应用菜单：默认菜单的 accelerator 在 Windows + 中文输入法(IME)
+  // 环境下会拦截 ' 和 " 等字符，导致它们无法输入到 xterm 终端。终端类应用不需要这些菜单。
+  Menu.setApplicationMenu(null)
+
   initSettings()
   initStore()
   registerIpc(terminalManager)

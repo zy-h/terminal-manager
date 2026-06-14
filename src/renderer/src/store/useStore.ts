@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { Session, ShellInfo, ShellType, LayoutMode, Settings, Lang } from '@shared/types'
 import { translate } from '../i18n'
+import { clearTerminalBuffer } from '../terminalBuffer'
 
 /** 一个分屏分组：名称 + 窗口数 + 排版预设 + 每格会话（可重复=复制显示） */
 export interface Group {
@@ -30,6 +31,7 @@ interface AppState {
   setDefaultCwd: (cwd: string) => Promise<void>
   setLanguage: (lang: Lang) => Promise<void>
   setTerminalBgColor: (color: string) => Promise<void>
+  setTerminalFontSize: (size: number) => Promise<void>
 
   // 分组操作
   createGroupByLayout: (n: LayoutMode) => void
@@ -62,7 +64,13 @@ function padSlots(slots: string[], n: number): string[] {
 export const useStore = create<AppState>((set, get) => ({
   sessions: [],
   shells: [],
-  settings: { defaultCwd: '', language: 'zh', terminalBgColor: '#1e1e1e', minimizeHintShown: false },
+  settings: {
+    defaultCwd: '',
+    language: 'zh',
+    terminalBgColor: '#1e1e1e',
+    terminalFontSize: 14,
+    minimizeHintShown: false
+  },
   language: 'zh',
   groups: [],
   activeGroupId: null,
@@ -98,6 +106,12 @@ export const useStore = create<AppState>((set, get) => ({
   setTerminalBgColor: async (color) => {
     await window.api.settings.setTerminalBgColor(color)
     set({ settings: { ...get().settings, terminalBgColor: color } })
+  },
+
+  setTerminalFontSize: async (size) => {
+    const clamped = Math.min(40, Math.max(8, Math.round(size)))
+    await window.api.settings.setTerminalFontSize(clamped)
+    set({ settings: { ...get().settings, terminalFontSize: clamped } })
   },
 
   createGroupByLayout: (n) => {
@@ -203,6 +217,7 @@ export const useStore = create<AppState>((set, get) => ({
     const singleId = get().singleSessionId === id ? null : get().singleSessionId
     await window.api.session.delete(id)
     window.api.terminal.kill(id)
+    clearTerminalBuffer(id)
     set({
       sessions: get().sessions.filter((s) => s.id !== id),
       groups,

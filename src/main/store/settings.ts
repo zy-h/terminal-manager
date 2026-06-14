@@ -12,6 +12,7 @@ let settings: Settings = {
   defaultCwd: '',
   language: 'zh',
   terminalBgColor: '#1e1e1e',
+  terminalFontSize: 14,
   minimizeHintShown: false
 }
 
@@ -26,6 +27,7 @@ export function initSettings(): void {
         language: data.language === 'en' ? 'en' : 'zh',
         terminalBgColor:
           typeof data.terminalBgColor === 'string' ? data.terminalBgColor : '#1e1e1e',
+        terminalFontSize: clampFontSize(data.terminalFontSize),
         minimizeHintShown: data.minimizeHintShown === true
       }
     }
@@ -58,6 +60,23 @@ export function setLanguage(lang: Lang): void {
 
 export function setTerminalBgColor(color: string): void {
   settings = { ...settings, terminalBgColor: color }
+  save()
+}
+
+/** 终端字体大小合法范围 */
+export const FONT_MIN = 8
+export const FONT_MAX = 40
+export const FONT_DEFAULT = 14
+
+/** 将任意值收敛到合法字体大小范围（非法值回退默认） */
+export function clampFontSize(value: unknown): number {
+  const n = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(n)) return FONT_DEFAULT
+  return Math.min(FONT_MAX, Math.max(FONT_MIN, Math.round(n)))
+}
+
+export function setTerminalFontSize(size: number): void {
+  settings = { ...settings, terminalFontSize: clampFontSize(size) }
   save()
 }
 

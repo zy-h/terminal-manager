@@ -43,7 +43,8 @@ const api: TerminalApi = {
     get: () => ipcRenderer.invoke('settings:get'),
     setDefaultCwd: (cwd) => ipcRenderer.invoke('settings:setDefaultCwd', { cwd }),
     setLanguage: (lang) => ipcRenderer.invoke('settings:setLanguage', { lang }),
-    setTerminalBgColor: (color) => ipcRenderer.invoke('settings:setTerminalBgColor', { color })
+    setTerminalBgColor: (color) => ipcRenderer.invoke('settings:setTerminalBgColor', { color }),
+    setTerminalFontSize: (size) => ipcRenderer.invoke('settings:setTerminalFontSize', { size })
   }
 }
 

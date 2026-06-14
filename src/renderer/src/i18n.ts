@@ -43,7 +43,11 @@ const zh: Record<string, string> = {
   'common.delete': '删除',
   'lang.toggle': 'EN',
   'terminal.bgColor': '终端背景色',
-  'terminal.customColor': '自定义颜色'
+  'terminal.customColor': '自定义颜色',
+  'terminal.font.bigger': '放大字体',
+  'terminal.font.smaller': '缩小字体',
+  'terminal.font.reset': '重置字体大小',
+  'terminal.font.size': '字号 {n}'
 }
 
 const en: Record<string, string> = {
@@ -89,7 +93,11 @@ const en: Record<string, string> = {
   'common.delete': 'Delete',
   'lang.toggle': '中',
   'terminal.bgColor': 'Terminal background',
-  'terminal.customColor': 'Custom color'
+  'terminal.customColor': 'Custom color',
+  'terminal.font.bigger': 'Increase font size',
+  'terminal.font.smaller': 'Decrease font size',
+  'terminal.font.reset': 'Reset font size',
+  'terminal.font.size': 'Size {n}'
 }
 
 const dicts: Record<Lang, Record<string, string>> = { zh, en }

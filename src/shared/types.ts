@@ -43,6 +43,8 @@ export interface Settings {
   defaultCwd: string
   language: Lang
   terminalBgColor: string
+  /** 终端字体大小（px），范围 8~40 */
+  terminalFontSize: number
   /** 是否已展示过"关闭即最小化"的提示（只首次提示） */
   minimizeHintShown: boolean
 }
@@ -74,6 +76,7 @@ export interface TerminalApi {
     setDefaultCwd: (cwd: string) => Promise<void>
     setLanguage: (lang: Lang) => Promise<void>
     setTerminalBgColor: (color: string) => Promise<void>
+    setTerminalFontSize: (size: number) => Promise<void>
   }
 }
 
