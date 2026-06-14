@@ -9,6 +9,7 @@ const api: TerminalApi = {
     resize: (sessionId, cols, rows) =>
       ipcRenderer.send('terminal:resize', { sessionId, cols, rows }),
     kill: (sessionId) => ipcRenderer.send('terminal:kill', { sessionId }),
+    interrupt: (sessionId) => ipcRenderer.send('terminal:interrupt', { sessionId }),
     onData: (cb) => {
       const handler = (
         _e: Electron.IpcRendererEvent,
@@ -44,7 +45,15 @@ const api: TerminalApi = {
     setDefaultCwd: (cwd) => ipcRenderer.invoke('settings:setDefaultCwd', { cwd }),
     setLanguage: (lang) => ipcRenderer.invoke('settings:setLanguage', { lang }),
     setTerminalBgColor: (color) => ipcRenderer.invoke('settings:setTerminalBgColor', { color }),
-    setTerminalFontSize: (size) => ipcRenderer.invoke('settings:setTerminalFontSize', { size })
+    setTerminalFontSize: (size) => ipcRenderer.invoke('settings:setTerminalFontSize', { size }),
+    setMinimizeShortcut: (shortcut) =>
+      ipcRenderer.invoke('settings:setMinimizeShortcut', { shortcut }),
+    setMaximizeShortcut: (shortcut) =>
+      ipcRenderer.invoke('settings:setMaximizeShortcut', { shortcut })
+  },
+  window: {
+    minimize: () => ipcRenderer.send('window:minimize'),
+    maximize: () => ipcRenderer.send('window:maximize')
   }
 }
 

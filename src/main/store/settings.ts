@@ -13,7 +13,9 @@ let settings: Settings = {
   language: 'zh',
   terminalBgColor: '#1e1e1e',
   terminalFontSize: 14,
-  minimizeHintShown: false
+  minimizeHintShown: false,
+  minimizeShortcut: 'Ctrl+Shift+M',
+  maximizeShortcut: 'Ctrl+Shift+F'
 }
 
 /** 应用 ready 后调用，从磁盘恢复设置 */
@@ -28,7 +30,11 @@ export function initSettings(): void {
         terminalBgColor:
           typeof data.terminalBgColor === 'string' ? data.terminalBgColor : '#1e1e1e',
         terminalFontSize: clampFontSize(data.terminalFontSize),
-        minimizeHintShown: data.minimizeHintShown === true
+        minimizeHintShown: data.minimizeHintShown === true,
+        minimizeShortcut:
+          typeof data.minimizeShortcut === 'string' ? data.minimizeShortcut : 'Ctrl+Shift+M',
+        maximizeShortcut:
+          typeof data.maximizeShortcut === 'string' ? data.maximizeShortcut : 'Ctrl+Shift+F'
       }
     }
   } catch {
@@ -82,5 +88,15 @@ export function setTerminalFontSize(size: number): void {
 
 export function setMinimizeHintShown(shown: boolean): void {
   settings = { ...settings, minimizeHintShown: shown }
+  save()
+}
+
+export function setMinimizeShortcut(shortcut: string): void {
+  settings = { ...settings, minimizeShortcut: shortcut }
+  save()
+}
+
+export function setMaximizeShortcut(shortcut: string): void {
+  settings = { ...settings, maximizeShortcut: shortcut }
   save()
 }

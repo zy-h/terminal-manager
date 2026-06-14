@@ -5,6 +5,7 @@ import { getPresets } from '../layoutPresets'
 import LayoutSwitcher from './LayoutSwitcher'
 import ConfirmDialog from './ConfirmDialog'
 import ColorPaletteDialog from './ColorPaletteDialog'
+import ShortcutSettingsDialog from './ShortcutSettingsDialog'
 
 /** 顶部分组栏：分组名 + 排版 + 分组切换 + 语言 + 背景色 + 删除组 + 窗口数 */
 export default function GroupBar() {
@@ -28,6 +29,7 @@ export default function GroupBar() {
   const [draft, setDraft] = useState('')
   const [confirmDelete, setConfirmDelete] = useState<Group | null>(null)
   const [colorDialogOpen, setColorDialogOpen] = useState(false)
+  const [shortcutDialogOpen, setShortcutDialogOpen] = useState(false)
 
   const activeGroup = groups.find((g) => g.id === activeGroupId) ?? null
   const singleSession = singleSessionId ? sessions.find((s) => s.id === singleSessionId) ?? null : null
@@ -127,6 +129,13 @@ export default function GroupBar() {
           onClick={() => setColorDialogOpen(true)}
           title={t('terminal.bgColor')}
         />
+        <button
+          className="lang-btn"
+          onClick={() => setShortcutDialogOpen(true)}
+          title={t('shortcut.settings')}
+        >
+          ⌨
+        </button>
         <div className="font-zoom">
           <button
             className="font-btn"
@@ -166,6 +175,9 @@ export default function GroupBar() {
         />
       )}
       {colorDialogOpen && <ColorPaletteDialog onClose={() => setColorDialogOpen(false)} />}
+      {shortcutDialogOpen && (
+        <ShortcutSettingsDialog onClose={() => setShortcutDialogOpen(false)} />
+      )}
     </div>
   )
 }

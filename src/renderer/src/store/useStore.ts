@@ -32,6 +32,8 @@ interface AppState {
   setLanguage: (lang: Lang) => Promise<void>
   setTerminalBgColor: (color: string) => Promise<void>
   setTerminalFontSize: (size: number) => Promise<void>
+  setMinimizeShortcut: (shortcut: string) => Promise<void>
+  setMaximizeShortcut: (shortcut: string) => Promise<void>
 
   // 分组操作
   createGroupByLayout: (n: LayoutMode) => void
@@ -69,7 +71,9 @@ export const useStore = create<AppState>((set, get) => ({
     language: 'zh',
     terminalBgColor: '#1e1e1e',
     terminalFontSize: 14,
-    minimizeHintShown: false
+    minimizeHintShown: false,
+    minimizeShortcut: 'Ctrl+Shift+M',
+    maximizeShortcut: 'Ctrl+Shift+F'
   },
   language: 'zh',
   groups: [],
@@ -112,6 +116,16 @@ export const useStore = create<AppState>((set, get) => ({
     const clamped = Math.min(40, Math.max(8, Math.round(size)))
     await window.api.settings.setTerminalFontSize(clamped)
     set({ settings: { ...get().settings, terminalFontSize: clamped } })
+  },
+
+  setMinimizeShortcut: async (shortcut) => {
+    await window.api.settings.setMinimizeShortcut(shortcut)
+    set({ settings: { ...get().settings, minimizeShortcut: shortcut } })
+  },
+
+  setMaximizeShortcut: async (shortcut) => {
+    await window.api.settings.setMaximizeShortcut(shortcut)
+    set({ settings: { ...get().settings, maximizeShortcut: shortcut } })
   },
 
   createGroupByLayout: (n) => {

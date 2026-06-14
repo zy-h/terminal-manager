@@ -47,7 +47,20 @@ const zh: Record<string, string> = {
   'terminal.font.bigger': '放大字体',
   'terminal.font.smaller': '缩小字体',
   'terminal.font.reset': '重置字体大小',
-  'terminal.font.size': '字号 {n}'
+  'terminal.font.size': '字号 {n}',
+  'common.close': '关闭',
+  'shortcut.settings': '快捷键设置',
+  'shortcut.title': '快捷键设置',
+  'shortcut.minimize': '最小化窗口',
+  'shortcut.maximize': '最大化 / 还原',
+  'shortcut.change': '修改',
+  'shortcut.clear': '清除',
+  'shortcut.recording': '请按下新的组合键…',
+  'shortcut.waiting': '等待按键…',
+  'shortcut.disabled': '（未设置）',
+  'shortcut.hint': '点击「修改」后按下新的组合键即可绑定；按 Esc 取消录制。两个快捷键不能相同。',
+  'shortcut.conflict': '该组合与另一项相同，请换一个。',
+  'shortcut.reserved': '此组合已被终端用于中断/粘贴，两者会同时生效。'
 }
 
 const en: Record<string, string> = {
@@ -97,7 +110,20 @@ const en: Record<string, string> = {
   'terminal.font.bigger': 'Increase font size',
   'terminal.font.smaller': 'Decrease font size',
   'terminal.font.reset': 'Reset font size',
-  'terminal.font.size': 'Size {n}'
+  'terminal.font.size': 'Size {n}',
+  'common.close': 'Close',
+  'shortcut.settings': 'Shortcuts',
+  'shortcut.title': 'Shortcuts',
+  'shortcut.minimize': 'Minimize window',
+  'shortcut.maximize': 'Maximize / Restore',
+  'shortcut.change': 'Change',
+  'shortcut.clear': 'Clear',
+  'shortcut.recording': 'Press a new key combo…',
+  'shortcut.waiting': 'Listening…',
+  'shortcut.disabled': '(none)',
+  'shortcut.hint': 'Click "Change" then press a key combo to bind; press Esc to cancel. The two shortcuts cannot be the same.',
+  'shortcut.conflict': 'This combo is already used by the other action.',
+  'shortcut.reserved': 'This combo is reserved by the terminal (interrupt/paste); both will fire.'
 }
 
 const dicts: Record<Lang, Record<string, string>> = { zh, en }

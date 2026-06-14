@@ -45,17 +45,36 @@ export default function TerminalPane({ sessionId, shellType, cwd }: TerminalPane
     term.loadAddon(fitAddon)
     term.open(container)
 
+    // 兼容合成事件（语音输入法等模拟的按键 e.code 可能为空）：结合 code/key/keyCode 判断
+    const isKeyC = (ev: KeyboardEvent): boolean =>
+      ev.code === 'KeyC' || ev.key === 'c' || ev.key === 'C' || ev.keyCode === 67
+    const isKeyV = (ev: KeyboardEvent): boolean =>
+      ev.code === 'KeyV' || ev.key === 'v' || ev.key === 'V' || ev.keyCode === 86
+
     term.attachCustomKeyEventHandler((e) => {
-      // 复制：Ctrl+Shift+C（有选区时）
-      if (e.ctrlKey && e.shiftKey && e.code === 'KeyC' && term.hasSelection()) {
-        navigator.clipboard.writeText(term.getSelection()).catch(() => {})
+      // 中断命令（SIGINT）：Ctrl+Shift+C → 走专门 interrupt 通道直写 pty（绕过 \x03 过滤）
+      if (e.type === 'keydown' && e.ctrlKey && e.shiftKey && isKeyC(e)) {
+        window.api.terminal.interrupt(sessionId)
         return false
       }
-      // 粘贴：Ctrl+Shift+V
-      if (e.ctrlKey && e.shiftKey && e.code === 'KeyV') {
+      // 复制：Ctrl+C 有选区时复制；无选区也拦截，避免作为 SIGINT 中断当前命令。
+      // 语音输入法模拟的 Ctrl+C 的 e.code 常为空，必须用 isKeyC 兜底，否则会漏拦 → 中断 pty 里的程序。
+      if (e.type === 'keydown' && e.ctrlKey && !e.shiftKey && !e.altKey && isKeyC(e)) {
+        if (term.hasSelection()) {
+          navigator.clipboard.writeText(term.getSelection()).catch(() => {})
+        }
+        return false
+      }
+      // 粘贴：Ctrl+V 或 Ctrl+Shift+V → 读剪贴板文本写入 pty。
+      // 必须拦截 Ctrl+V：语音输入法用 Ctrl+V 粘贴，但其合成的 Ctrl+V 若放行，
+      // 会被 xterm 转成 \x16 发往 pty，被 codex/claude 等解释为特殊键
+      // （codex 报 "Failed to paste image"），导致文本进不去。统一走 term.paste 写真实文本。
+      if (e.type === 'keydown' && e.ctrlKey && !e.altKey && isKeyV(e)) {
         navigator.clipboard
           .readText()
-          .then((text) => term.paste(text))
+          .then((text) => {
+            if (text) term.paste(text)
+          })
           .catch(() => {})
         return false
       }
@@ -105,6 +124,14 @@ export default function TerminalPane({ sessionId, shellType, cwd }: TerminalPane
       window.api.terminal.input(sessionId, data)
     })
 
+    // 阻止 xterm 自带 paste 处理：合成事件（语音输入法）下浏览器 paste 仍会触发，
+    // 会与 keydown handler 里的 term.paste 重复写入文本。粘贴统一由 term.paste 完成。
+    const onPaste = (ev: ClipboardEvent): void => {
+      ev.preventDefault()
+      ev.stopPropagation()
+    }
+    container.addEventListener('paste', onPaste, true)
+
     const ro = new ResizeObserver(doFit)
     ro.observe(container)
     window.addEventListener('resize', doFit)
@@ -115,6 +142,7 @@ export default function TerminalPane({ sessionId, shellType, cwd }: TerminalPane
       if (fitTimer !== null) window.clearTimeout(fitTimer)
       offData()
       inputDisposable.dispose()
+      container.removeEventListener('paste', onPaste, true)
       ro.disconnect()
       window.removeEventListener('resize', doFit)
       // 注意：这里不调用 terminal.kill —— pty 生命周期与会话绑定，

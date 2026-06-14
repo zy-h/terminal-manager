@@ -6,6 +6,7 @@ import Splitter from './components/Splitter'
 import GroupBar from './components/GroupBar'
 import { useStore } from './store/useStore'
 import { initTerminalBuffer } from './terminalBuffer'
+import { eventToShortcut } from './lib/shortcut'
 
 export default function App() {
   const leftPct = useStore((s) => s.leftPct)
@@ -22,6 +23,24 @@ export default function App() {
     initTerminalBuffer()
     load()
   }, [load])
+
+  // 全局窗口快捷键（最小化 / 最大化·还原）：应用聚焦时生效
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent): void => {
+      const sc = eventToShortcut(e)
+      if (!sc) return
+      const { minimizeShortcut, maximizeShortcut } = useStore.getState().settings
+      if (minimizeShortcut && sc === minimizeShortcut) {
+        e.preventDefault()
+        window.api.window.minimize()
+      } else if (maximizeShortcut && sc === maximizeShortcut) {
+        e.preventDefault()
+        window.api.window.maximize()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const activeGroup = groups.find((g) => g.id === activeGroupId) ?? null
 

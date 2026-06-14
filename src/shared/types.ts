@@ -47,6 +47,10 @@ export interface Settings {
   terminalFontSize: number
   /** 是否已展示过"关闭即最小化"的提示（只首次提示） */
   minimizeHintShown: boolean
+  /** 最小化窗口快捷键（规范化字符串如 "Ctrl+Shift+M"，空串=禁用） */
+  minimizeShortcut: string
+  /** 最大化/还原窗口快捷键（空串=禁用） */
+  maximizeShortcut: string
 }
 
 /** 通过 contextBridge 暴露给渲染进程的终端 API 形状 */
@@ -56,6 +60,7 @@ export interface TerminalApi {
     input: (sessionId: string, data: string) => void
     resize: (sessionId: string, cols: number, rows: number) => void
     kill: (sessionId: string) => void
+    interrupt: (sessionId: string) => void
     onData: (cb: (payload: { sessionId: string; data: string }) => void) => () => void
     onExit: (cb: (payload: { sessionId: string; exitCode: number }) => void) => () => void
   }
@@ -77,6 +82,12 @@ export interface TerminalApi {
     setLanguage: (lang: Lang) => Promise<void>
     setTerminalBgColor: (color: string) => Promise<void>
     setTerminalFontSize: (size: number) => Promise<void>
+    setMinimizeShortcut: (shortcut: string) => Promise<void>
+    setMaximizeShortcut: (shortcut: string) => Promise<void>
+  }
+  window: {
+    minimize: () => void
+    maximize: () => void
   }
 }
 

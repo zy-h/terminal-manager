@@ -1,4 +1,4 @@
-import { ipcMain, dialog } from 'electron'
+import { ipcMain, dialog, BrowserWindow } from 'electron'
 import { TerminalManager } from '../terminal/manager'
 import { detectShells } from '../terminal/shells'
 import {
@@ -12,7 +12,9 @@ import {
   setDefaultCwd,
   setLanguage,
   setTerminalBgColor,
-  setTerminalFontSize
+  setTerminalFontSize,
+  setMinimizeShortcut,
+  setMaximizeShortcut
 } from '../store/settings'
 import type { ShellType, Lang } from '../../shared/types'
 
@@ -27,7 +29,13 @@ export function registerIpc(manager: TerminalManager): void {
     }
   )
   ipcMain.on('terminal:input', (_e, args: { sessionId: string; data: string }) => {
-    manager.write(args.sessionId, args.data)
+    // 剥离 Ctrl+C(ETX,\x03)：语音输入法等可能绕过前端 DOM 拦截模拟 Ctrl+C，
+    // 裸 \x03 会作为 SIGINT 中断终端里的程序（如 Claude Code）。真正中断走 interrupt 通道直写 pty。
+    const safe = args.data.replace(/\x03/g, '')
+    if (safe) manager.write(args.sessionId, safe)
+  })
+  ipcMain.on('terminal:interrupt', (_e, args: { sessionId: string }) => {
+    manager.write(args.sessionId, '\x03')
   })
   ipcMain.on('terminal:resize', (_e, args: { sessionId: string; cols: number; rows: number }) => {
     manager.resize(args.sessionId, args.cols, args.rows)
@@ -84,5 +92,24 @@ export function registerIpc(manager: TerminalManager): void {
   ipcMain.handle('settings:setTerminalFontSize', (_e, args: { size: number }) => {
     setTerminalFontSize(args.size)
     return { ok: true }
+  })
+  ipcMain.handle('settings:setMinimizeShortcut', (_e, args: { shortcut: string }) => {
+    setMinimizeShortcut(args.shortcut)
+    return { ok: true }
+  })
+  ipcMain.handle('settings:setMaximizeShortcut', (_e, args: { shortcut: string }) => {
+    setMaximizeShortcut(args.shortcut)
+    return { ok: true }
+  })
+
+  // ===== 窗口控制（应用内快捷键驱动；聚焦窗口即主窗口） =====
+  ipcMain.on('window:minimize', () => {
+    BrowserWindow.getFocusedWindow()?.minimize()
+  })
+  ipcMain.on('window:maximize', () => {
+    const win = BrowserWindow.getFocusedWindow()
+    if (!win) return
+    if (win.isMaximized()) win.unmaximize()
+    else win.maximize()
   })
 }
